@@ -1,0 +1,38 @@
+image: rozum/python3-qa
+
+cache:
+  paths:
+    - $BUILD_PATH/{{cookiecutter.project_name}}/venv
+    - $BUILD_PATH/{{cookiecutter.project_name}}/allure_report/history
+
+stages:
+  - build
+  - test
+  - deploy
+
+env:
+  stage: build
+  script:
+    - make venv
+  artifacts:
+    paths:
+      - venv
+
+test:
+  stage: test
+  script:
+    - make test
+  artifacts:
+    reports:
+      junit: junit.xml
+    paths:
+      - allure_results
+
+pages:
+  stage: deploy
+  script:
+    - make report
+    - mkdir public && cp -r allure_report/* public
+  artifacts:
+    paths:
+      - public
